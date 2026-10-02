@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아름다운 힐링 페이지</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: 아름다운 세리프 폰트와 깔끔한 산세리프 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Noto Sans KR', sans-serif;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-sans);
+        }
+
+        /* 부드럽게 움직이는 그라데이션 배경 */
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 캔버스 배경 설정 */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none; /* 클릭 이벤트 통과 */
+        }
+
+        /* 글래스모피즘 (유리 질감) 카드 스타일 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        /* 세리프 폰트 적용 클래스 */
+        .font-serif-custom {
+            font-family: var(--font-serif);
+        }
+
+        /* 문구 페이드 효과 */
+        .fade-transition {
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen text-gray-800 relative">
+    
+    <!-- 움직이는 배경과 파티클 캔버스 -->
+    <div class="animated-bg"></div>
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- 중앙 컨텐츠 컨테이너 -->
+    <main class="relative z-10 w-full max-w-lg px-6">
+        <!-- 글래스모피즘 카드 -->
+        <div class="glass-card rounded-3xl p-10 text-center transform transition-transform duration-500 hover:scale-[1.02]">
+            
+            <!-- 장식용 작은 아이콘/텍스트 -->
+            <p class="text-white/80 text-sm tracking-[0.3em] uppercase mb-6 font-light">
+                Moment of Peace
+            </p>
+            
+            <!-- 인용구 텍스트 -->
+            <h1 id="quoteText" class="font-serif-custom text-3xl md:text-4xl text-gray-900 leading-snug mb-8 fade-transition opacity-100 italic">
+                "가장 아름다운 것은 눈에 보이지 않고<br>마음으로 느껴지는 법입니다."
+            </h1>
+            
+            <p id="quoteAuthor" class="text-gray-700 font-medium mb-10 fade-transition opacity-100">
+                - 앙투안 드 생텍쥐페리 -
+            </p>
+
+            <!-- 인터랙션 버튼 -->
+            <button id="interactBtn" class="group relative px-8 py-3 rounded-full bg-white/20 hover:bg-white/40 border border-white/50 text-gray-900 transition-all duration-300 backdrop-blur-sm overflow-hidden shadow-sm hover:shadow-md">
+                <span class="relative z-10 text-sm font-medium tracking-wider">새로운 영감 받기</span>
+                <div class="absolute inset-0 h-full w-0 bg-white/30 transition-all duration-300 ease-out group-hover:w-full z-0"></div>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        const quotes = [
+            { text: "\"가장 아름다운 것은 눈에 보이지 않고<br>마음으로 느껴지는 법입니다.\"", author: "- 앙투안 드 생텍쥐페리 -" },
+            { text: "\"당신의 하루가 숲속의 빛처럼<br>따스하고 평온하기를.\"", author: "- 힐링 메시지 -" },
+            { text: "\"별빛은 어둠 속에서<br>가장 밝게 빛납니다.\"", author: "- 희망 메시지 -" },
+            { text: "\"잠시 멈춰서서<br>당신을 둘러싼 아름다움을 숨 쉬어보세요.\"", author: "- 평온 메시지 -" },
+            { text: "\"모든 꽃이 피어나는 데는<br>자신만의 시간이 필요합니다.\"", author: "- 격려 메시지 -" }
+        ];
+
+        let currentQuoteIndex = 0;
+        const quoteText = document.getElementById('quoteText');
+        const quoteAuthor = document.getElementById('quoteAuthor');
+        const interactBtn = document.getElementById('interactBtn');
+
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        const config = {
+            particleCount: 80,
+            baseRadius: 1.5,
+            glowBlur: 15,
+            speedMultiplier: 0.5
+        };
+
+        // 캔버스 크기 리사이징 함수
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * height; // 초기에는 화면 전체에 무작위 배치
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = height + Math.random() * 100; // 바닥 아래에서 생성
+                this.radius = Math.random() * config.baseRadius + 0.5;
+                this.vx = (Math.random() - 0.5) * 0.5; // 좌우 흔들림
+                this.vy = -(Math.random() * 1 + 0.2) * config.speedMultiplier; // 위로 상승
+                this.alpha = Math.random() * 0.5 + 0.1;
+                this.color = Math.random() > 0.5 ? '255, 255, 255' : '255, 230, 250'; // 흰색 또는 옅은 핑크
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // 화면 밖으로 나가면 리셋
+                if (this.y < -10 || this.x < -10 || this.x > width + 10) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+                
+                // 빛나는 효과 (Glow)
+                ctx.shadowBlur = config.glowBlur;
+                ctx.shadowColor = `rgba(${this.color}, ${this.alpha})`;
+                
+                ctx.fill();
+                
+                // 그림자 초기화 (다른 그리기에 영향 안주기 위해)
+                ctx.shadowBlur = 0;
+            }
+
+            // 버튼 클릭 시 발생하는 파티클 버스트 효과
+            burst() {
+                this.vy = -(Math.random() * 5 + 2); // 순간적으로 위로 솟구침
+                this.vx = (Math.random() - 0.5) * 3;
+                this.alpha = 1; // 밝기 최대
+            }
+        }
+
+        // 파티클 생성
+        for (let i = 0; i < config.particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        // 애니메이션 루프
+        function animate() {
+            ctx.clearRect(0, 0, width, height); // 화면 지우기
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // 초기 애니메이션 시작
+        animate();
+
+        // 버튼 클릭 이벤트 처리
+        interactBtn.addEventListener('click', () => {
+            // 1. 텍스트 페이드 아웃
+            quoteText.style.opacity = '0';
+            quoteAuthor.style.opacity = '0';
+
+            // 2. 파티클 버스트 효과
+            particles.forEach(p => {
+                if(Math.random() > 0.5) p.burst();
+            });
+
+            // 3. 약간의 지연 후 텍스트 변경 및 페이드 인
+            setTimeout(() => {
+                currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+                quoteText.innerHTML = quotes[currentQuoteIndex].text;
+                quoteAuthor.textContent = quotes[currentQuoteIndex].author;
+                
+                quoteText.style.opacity = '1';
+                quoteAuthor.style.opacity = '1';
+            }, 500); // CSS transition 시간과 동일하게 맞춤
+        });
+
+    </script>
+</body>
+</html>
