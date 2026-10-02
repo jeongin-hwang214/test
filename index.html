@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트 웹페이지</title>
+    <!-- Tailwind CSS 불러오기 (깔끔한 레이아웃과 스타일링을 위해 사용) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        /* 커스텀 전환 효과 애니메이션 */
+        .transition-all-custom {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 400ms;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="card" class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center transition-all-custom">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">테스트 페이지</h1>
+        
+        <p id="description" class="text-gray-500 mb-8 transition-colors duration-300">
+            이 페이지는 HTML, CSS, JavaScript 동작을 확인하기 위한 간단한 예제입니다. 아래 버튼을 클릭해 보세요.
+        </p>
+
+        <button id="actionBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto">
+            색상 및 텍스트 변경
+        </button>
+    </div>
+
+    <script>
+        // DOM 요소 선택
+        const card = document.getElementById('card');
+        const description = document.getElementById('description');
+        const actionBtn = document.getElementById('actionBtn');
+
+        // 상태 변수: 현재 상태가 변경되었는지 추적
+        let isChanged = false;
+
+        // 버튼 클릭 이벤트 리스너 추가
+        actionBtn.addEventListener('click', function() {
+            isChanged = !isChanged; // 상태 토글
+
+            if (isChanged) {
+                // 변경된 상태의 스타일과 텍스트 적용
+                card.classList.remove('bg-white');
+                card.classList.add('bg-indigo-50'); // 배경을 연한 인디고 색상으로 변경
+                
+                description.textContent = "JavaScript가 성공적으로 동작했습니다! 색상과 텍스트가 변경된 것을 확인하실 수 있습니다.";
+                description.classList.remove('text-gray-500');
+                description.classList.add('text-indigo-600');
+                
+                actionBtn.textContent = "원래대로 되돌리기";
+                actionBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                actionBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            } else {
+                // 원래 상태의 스타일과 텍스트로 복구
+                card.classList.remove('bg-indigo-50');
+                card.classList.add('bg-white');
+                
+                description.textContent = "이 페이지는 HTML, CSS, JavaScript 동작을 확인하기 위한 간단한 예제입니다. 아래 버튼을 클릭해 보세요.";
+                description.classList.remove('text-indigo-600');
+                description.classList.add('text-gray-500');
+                
+                actionBtn.textContent = "색상 및 텍스트 변경";
+                actionBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                actionBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+            }
+        });
+    </script>
+</body>
+</html>
